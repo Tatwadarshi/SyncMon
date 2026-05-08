@@ -5,7 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ntrcaebpt.syncmon.screens.AppwriteLoginScreen
+import com.ntrcaebpt.syncmon.screens.HomeScreen
+import com.ntrcaebpt.syncmon.screens.LoginScreen
 import com.ntrcaebpt.syncmon.screens.SplashScreen
+import com.ntrcaebpt.syncmon.screens.ThingSpeakLoginScreen
 import com.ntrcaebpt.syncmon.screens.WelcomeScreen
 
 @Composable
@@ -19,7 +23,16 @@ fun Navigation(modifier: Modifier = Modifier) {
             WelcomeScreen(navController)
         }
         composable("home_screen") {
-//            HomeScreen()
+            HomeScreen(navController)
+        }
+        composable("login_screen") {
+            LoginScreen(navController)
+        }
+        composable("appwrite_login_screen") {
+            AppwriteLoginScreen(navController)
+        }
+        composable("thingspeak_login_screen") {
+            ThingSpeakLoginScreen(navController)
         }
     }
 }

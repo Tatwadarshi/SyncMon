@@ -1,4 +1,4 @@
-package com.ntrcaebpt.syncmon.screens
+ package com.ntrcaebpt.syncmon.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -63,7 +63,7 @@ fun WelcomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 //                lineHeight = 28.sp,
 
             )
-            Button(onClick = { navController.navigate("home_screen") }, modifier=modifier.padding(16.dp), shape = CircleShape, colors = buttonColors(containerColor = Color(0xFF6D1DFF), contentColor = Color.White)) { Text("Continue", fontSize = 24.sp, modifier = modifier.padding(8.dp))}
+            Button(onClick = { navController.navigate("login_screen") }, modifier=modifier.padding(16.dp), shape = CircleShape, colors = buttonColors(containerColor = Color(0xFF6D1DFF), contentColor = Color.White)) { Text("Continue", fontSize = 24.sp, modifier = modifier.padding(8.dp))}
 
         }
     }
