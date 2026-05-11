@@ -2,6 +2,7 @@ package com.ntrcaebpt.syncmon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,7 +33,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             AppwriteLoginScreen(navController)
         }
         composable("thingspeak_login_screen") {
-            ThingSpeakLoginScreen(navController)
+            ThingSpeakLoginScreen(navController, LocalContext.current)
         }
     }
 }

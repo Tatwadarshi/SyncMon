@@ -1,5 +1,6 @@
 package com.ntrcaebpt.syncmon.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ntrcaebpt.syncmon.R
@@ -171,9 +173,11 @@ fun AppwriteLoginScreen(navController: NavController, modifier: Modifier = Modif
 }
 
 @Composable
-fun ThingSpeakLoginScreen(navController: NavController, modifier: Modifier = Modifier){
+fun ThingSpeakLoginScreen(navController: NavController, context: Context, modifier: Modifier = Modifier){
     var thingSpeakReadAPIKey by remember { mutableStateOf("") }
+    var thingSpeakChannelID by remember { mutableStateOf("") }
 
+    var savedData by remember { mutableStateOf("") }
 
     Column(modifier.fillMaxWidth().background(PurpleTintBG).padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,28 +196,64 @@ fun ThingSpeakLoginScreen(navController: NavController, modifier: Modifier = Mod
         )
         Spacer(modifier.weight(0.01f))
         TextField(
-//            modifier.weight(1f),
             value = thingSpeakReadAPIKey,
-            onValueChange = {newText -> thingSpeakReadAPIKey = newText},
+            onValueChange = {thingSpeakReadAPIKey = it},
             label = {Text("Enter Your Read API Key")}
+            )
+        Spacer(modifier.weight(0.01f))
+        TextField(
+            value = thingSpeakChannelID,
+            onValueChange = {thingSpeakChannelID = it},
+            label = {Text("Enter Your Channel ID")}
             )
         Spacer(modifier.weight(0.1f))
         Button(
-            onClick = {  },
+            onClick = {
+                val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+                sharedPref.edit {
+                    putString("thingspeak_api_key", thingSpeakReadAPIKey)
+                    putString("thingspeak_channel_id", thingSpeakChannelID)
+                    putBoolean("isLoggedIn", true)
+                    putString("login_with", "thingspeak")
+                }
+                navController.navigate("home_screen") {
+                    popUpTo("login_screen") { inclusive = true }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
         ){
             Text("Save & Connect", fontSize = 20.sp)
         }
-        Spacer(modifier.weight(1f))
+        Spacer(modifier.weight(0.5f))
+
+//        Temp:
+//        Button(
+//            onClick = {
+//                val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+//                val savedKey = sharedPref.getString("thingspeak_api_key", "No API Key Found")
+//
+//                savedData = "API Key: $savedKey"
+//            },
+//            modifier = Modifier.fillMaxWidth().height(60.dp),
+//            shape = CircleShape,
+//            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
+//        ){
+//            Text("Show Data", fontSize = 20.sp)
+//        }
+//        Spacer(modifier.weight(0.5f))
+//        if(savedData.isNotEmpty()){
+//            Text(text = savedData)
+//        }
+//        Spacer(modifier.weight(0.5f))
     }
 }
 
 @Preview(showSystemUi = true)
 @Composable
 fun LogInScreenPreview() {
-    ThingSpeakLoginScreen(navController = rememberNavController())
+    ThingSpeakLoginScreen(navController = rememberNavController(), LocalContext.current)
 //    AppwriteLoginScreen(navController = rememberNavController())
 //    LoginScreen(navController = rememberNavController())
 }

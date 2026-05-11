@@ -36,13 +36,12 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun SplashScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun SplashScreen(navController: NavController, context: Context=LocalContext.current, modifier: Modifier = Modifier) {
     val scale = remember { Animatable(1.5f) }
     val alpha = remember { Animatable(0f) }
 
-//    val dataStoreContext = LocalContext.current
-//    val dataStoreManager = remember { DataStoreManager(dataStoreContext) }
-//    val scope = rememberCoroutineScope()
+    val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+    val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
 
     LaunchedEffect(key1 = true, key2 = true) {
         val alphaJob = launch {
@@ -56,7 +55,15 @@ fun SplashScreen(navController: NavController, modifier: Modifier = Modifier) {
         scaleJob.join()
 
         delay(500L)
-        navController.navigate("welcome_screen")
+        if (isLoggedIn){
+            navController.navigate("home_screen") {
+                popUpTo("splash_screen") { inclusive = true }
+            }
+        } else {
+            navController.navigate("welcome_screen") {
+                popUpTo("splash_screen") { inclusive = true }
+            }
+        }
     }
     Column(modifier= modifier.fillMaxSize().background(PurpleTintBG),
         verticalArrangement = Arrangement.SpaceAround,
@@ -69,5 +76,5 @@ fun SplashScreen(navController: NavController, modifier: Modifier = Modifier) {
 @Preview(showSystemUi = true)
 @Composable
 fun SplashScreenPreview() {
-    SplashScreen(navController = rememberNavController())
+    SplashScreen(navController = rememberNavController(), LocalContext.current)
 }

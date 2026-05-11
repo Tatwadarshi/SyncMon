@@ -54,7 +54,7 @@ fun WelcomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             .weight(0.05f)
             .background(Color.Yellow)
             , horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("Wellcome to SyncMon",
+            Text("Welcome to SyncMon",
                 fontSize = 60.sp,
                 fontWeight = FontWeight(1000),
                 color = Color(0xFF002FFF),
@@ -63,7 +63,17 @@ fun WelcomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 //                lineHeight = 28.sp,
 
             )
-            Button(onClick = { navController.navigate("login_screen") }, modifier=modifier.padding(16.dp), shape = CircleShape, colors = buttonColors(containerColor = Color(0xFF6D1DFF), contentColor = Color.White)) { Text("Continue", fontSize = 24.sp, modifier = modifier.padding(8.dp))}
+            Button(onClick = {
+                                navController.navigate("login_screen"){
+                                    popUpTo("welcome_screen") { inclusive = true }
+                                }
+                             },
+                modifier=modifier.padding(16.dp),
+                shape = CircleShape,
+                colors = buttonColors(containerColor = Color(0xFF6D1DFF),
+                    contentColor = Color.White)) {
+                Text("Continue", fontSize = 24.sp, modifier = modifier.padding(8.dp))
+            }
 
         }
     }
