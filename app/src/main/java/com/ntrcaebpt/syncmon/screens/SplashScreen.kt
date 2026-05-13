@@ -45,10 +45,10 @@ fun SplashScreen(navController: NavController, context: Context=LocalContext.cur
 
     LaunchedEffect(key1 = true, key2 = true) {
         val alphaJob = launch {
-            alpha.animateTo(1f, animationSpec = tween(5000))
+            alpha.animateTo(1f, animationSpec = tween(3000))
         }
         val scaleJob = launch {
-            scale.animateTo(2f, animationSpec = tween(5000))
+            scale.animateTo(2f, animationSpec = tween(3000))
         }
 
         alphaJob.join()

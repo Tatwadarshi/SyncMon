@@ -79,7 +79,9 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
         ) {
             Button(
                 onClick = { navController.navigate("appwrite_login_screen")},
-                modifier = Modifier.fillMaxWidth().height(60.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
             ) {
@@ -106,7 +108,9 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
             Text("Or")
             Button(
                 onClick = { navController.navigate("thingspeak_login_screen") },
-                modifier = Modifier.fillMaxWidth().height(60.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
             ) {
@@ -138,7 +142,10 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
 
 @Composable
 fun AppwriteLoginScreen(navController: NavController, modifier: Modifier = Modifier){
-    Column(modifier.fillMaxSize().background(PurpleTintBG).padding(8.dp),
+    Column(modifier
+        .fillMaxSize()
+        .background(PurpleTintBG)
+        .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center){
         Spacer(modifier.weight(0.01f))
@@ -161,7 +168,9 @@ fun AppwriteLoginScreen(navController: NavController, modifier: Modifier = Modif
         Spacer(modifier.weight(0.1f))
         Button(
             onClick = { navController.popBackStack() },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
         ){
@@ -179,7 +188,10 @@ fun ThingSpeakLoginScreen(navController: NavController, context: Context, modifi
 
     var savedData by remember { mutableStateOf("") }
 
-    Column(modifier.fillMaxWidth().background(PurpleTintBG).padding(8.dp),
+    Column(modifier
+        .fillMaxWidth()
+        .background(PurpleTintBG)
+        .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         Spacer(modifier.weight(0.1f))
@@ -206,7 +218,7 @@ fun ThingSpeakLoginScreen(navController: NavController, context: Context, modifi
             onValueChange = {thingSpeakChannelID = it},
             label = {Text("Enter Your Channel ID")}
             )
-        Spacer(modifier.weight(0.1f))
+        Spacer(modifier.weight(0.01f))
         Button(
             onClick = {
                 val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
@@ -220,33 +232,43 @@ fun ThingSpeakLoginScreen(navController: NavController, context: Context, modifi
                     popUpTo("login_screen") { inclusive = true }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
             shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF)),
+            enabled = if (thingSpeakChannelID=="" || thingSpeakReadAPIKey == "") false else true
         ){
             Text("Save & Connect", fontSize = 20.sp)
         }
+
+        Spacer(modifier.weight(0.1f))
+        Text("Or", fontSize = 20.sp)
+        Spacer(modifier.weight(0.1f))
+
+        Button(
+            onClick = {
+                val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+                sharedPref.edit {
+                    putBoolean("isLoggedIn", true)
+                    putString("login_with", "thingspeak_web")
+                }
+                navController.navigate("home_screen") {
+                    popUpTo("login_screen") { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF)),
+            enabled = if (thingSpeakChannelID=="" || thingSpeakReadAPIKey == "") true else false
+        ){
+            Text("Go to Web View", fontSize = 20.sp)
+        }
+
         Spacer(modifier.weight(0.5f))
 
-//        Temp:
-//        Button(
-//            onClick = {
-//                val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
-//                val savedKey = sharedPref.getString("thingspeak_api_key", "No API Key Found")
-//
-//                savedData = "API Key: $savedKey"
-//            },
-//            modifier = Modifier.fillMaxWidth().height(60.dp),
-//            shape = CircleShape,
-//            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D1DFF))
-//        ){
-//            Text("Show Data", fontSize = 20.sp)
-//        }
-//        Spacer(modifier.weight(0.5f))
-//        if(savedData.isNotEmpty()){
-//            Text(text = savedData)
-//        }
-//        Spacer(modifier.weight(0.5f))
     }
 }
 

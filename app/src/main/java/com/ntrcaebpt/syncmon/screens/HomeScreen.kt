@@ -1,7 +1,13 @@
 package com.ntrcaebpt.syncmon.screens
 
 import android.content.Context
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,19 +21,24 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.ntrcaebpt.syncmon.ui.theme.PurpleTintBG
 import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.ntrcaebpt.syncmon.view_models.ThingSpeakViewModel
 import com.ntrcaebpt.syncmon.view_models.UiState
 
@@ -35,7 +46,7 @@ import com.ntrcaebpt.syncmon.view_models.UiState
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
-    val loginWith = sharedPref.getString("login_with", "thingspeak")
+    val loginWith = sharedPref.getString("login_with", "thingspeak_web")
 
     if (loginWith == "thingspeak") {
         val apiKey = sharedPref.getString("thingspeak_api_key", "No Key Found")
@@ -49,7 +60,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             }
         }
 
-        HomeScreenContent(
+        HomeScreenContentThingSpeak(
             loginWith = loginWith ?: "thingspeak",
             apiKey = apiKey ?: "No Key",
             channelId = channelId ?: "No ID",
@@ -62,6 +73,71 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             },
             modifier = modifier
         )
+    } else if (loginWith == "thingspeak_web") {
+        if (LocalInspectionMode.current) {
+            // Display a placeholder in Preview mode to avoid WebView initialization errors
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("WebView is not supported in Preview")
+            }
+        } else {
+            val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            val webView = remember {
+                WebView(context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+
+                    settings.javaScriptEnabled = true
+                    webViewClient = WebViewClient()
+
+                    // Load WebPage:
+                    loadUrl("https://thingspeak.com/login")
+                }
+            }
+
+            DisposableEffect(webView) {
+                val callback = object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (webView.canGoBack()) {
+                            webView.goBack()
+                        } else {
+                            isEnabled = false
+                            onBackPressedDispatcher?.onBackPressed()
+                        }
+                    }
+                }
+                onBackPressedDispatcher?.addCallback(callback)
+
+                onDispose {
+                    callback.remove()
+                    webView.stopLoading()
+                    webView.destroy()
+                }
+            }
+            Box(modifier = modifier.fillMaxSize()) {
+                AndroidView(
+                    factory = { webView },
+                    modifier = Modifier.fillMaxSize()
+                )
+                Button(
+                    onClick = {
+                        sharedPref.edit { clear() }
+                        navController.navigate("login_screen") {
+                            popUpTo("home_screen") { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    Text("Logout")
+                }
+            }
+        }
     } else {
         Column(modifier.fillMaxSize().background(PurpleTintBG).padding(16.dp)) {
             Text("Logged in via: $loginWith", style = MaterialTheme.typography.bodyLarge)
@@ -79,7 +155,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeScreenContent(
+fun HomeScreenContentThingSpeak(
     loginWith: String,
     apiKey: String,
     channelId: String,
@@ -160,12 +236,13 @@ fun HomeScreenContent(
 
 @Preview(showSystemUi = true)
 @Composable
-fun HomeScreenPreview() {
-    HomeScreenContent(
-        loginWith = "thingspeak",
-        apiKey = "SAMPLE_KEY",
-        channelId = "12345",
-        state = UiState.Loading,
-        onLogout = {}
-    )
+fun HomeScreenPreviewThingSpeak() {
+//    HomeScreenContentThingSpeak(
+//        loginWith = "thingspeak",
+//        apiKey = "SAMPLE_KEY",
+//        channelId = "12345",
+//        state = UiState.Loading,
+//        onLogout = {}
+//    )
+    HomeScreen(navController = rememberNavController())
 }
